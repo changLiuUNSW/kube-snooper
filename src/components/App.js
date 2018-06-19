@@ -9,14 +9,21 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       servers: [],
       error: null
     };
   }
 
   componentDidMount() {
-    this.fetchServers();
+    this.refresh();
   }
+
+  refresh = () => {
+    this.setState({ loading: true, error: null, servers: [] }, () => {
+      this.fetchServers();
+    });
+  };
 
   fetchServers = async () => {
     try {
@@ -30,12 +37,16 @@ class App extends Component {
             break;
           }
         }
-        const { data } = await axios.get(`http://mcapi.us/server/status?ip=${ipAddr}&port=25565`);
-        server.status = data;
+        try {
+          const { data } = await axios.get(`http://mcapi.us/server/status?ip=${ipAddr}&port=25565`);
+          server.status = data;
+        } catch (error) {
+          server.status = error;
+        }
       }
-      this.setState({ error: null, servers: data });
+      this.setState({ loading: false, error: null, servers: data });
     } catch (error) {
-      this.setState({ error });
+      this.setState({ loading: false, error });
     }
   };
 
@@ -43,6 +54,12 @@ class App extends Component {
     return (
       <div className="app">
         <Nav />
+        <div className="container app__btn-group">
+          <Button bsStyle="primary" disabled={this.state.loading}>
+            Add
+          </Button>
+          {this.state.error && <p>{this.state.error}</p>}
+        </div>
         {this.state.servers.map(server => (
           <Server
             key={server.name}
@@ -51,11 +68,6 @@ class App extends Component {
             status={server.status}
           />
         ))}
-
-        <div className="container">
-          <Button bsStyle="primary">Add</Button>
-          {this.state.error && <p>{this.state.error}</p>}
-        </div>
       </div>
     );
   }

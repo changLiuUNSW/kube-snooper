@@ -1,3 +1,7 @@
 .app .navbar-brand{
   color: #fff;
 }
+
+.app .app__btn-group{
+  margin-bottom:1rem;
+}
