@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/changLiuUNSW/kube-snooper.svg?branch=master)](https://travis-ci.org/changLiuUNSW/kube-snooper)
+
 # Kube-snooper
 Kubernate server dashboard for Microsoft OpenHack - Container based on [kubernetes-client](https://github.com/kubernetes-client/javascript)
 
