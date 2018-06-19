@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: kubesnooper
+  name: kubesnooper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubesnooper
+  template:
+    metadata:
+      labels:
+        app: kubesnooper
+    spec:
+      containers:
+      - image: changliuunsw/kubesnooper
+        name: kubesnooper
+        ports:
+        - containerPort: 4000
