@@ -1,7 +1,5 @@
 # Kube-snooper
-Kubernate server dashboard for Microsoft OpenHack - Container
-
-[OMDb API](http://www.omdbapi.com/)
+Kubernate server dashboard for Microsoft OpenHack - Container based on [kubernetes-client](https://github.com/kubernetes-client/javascript)
 
 ## How to start
 
