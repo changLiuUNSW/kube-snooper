@@ -17,6 +17,10 @@ npm start
 ## Docker
 
 ```bash
+# build
+docker build -t changliuunsw/kubesnooper .
+# run
+docker run --rm -p 8080:4000 changliuunsw/kubesnooper
 # build and publish
 ./docker-publish.sh
 ```
