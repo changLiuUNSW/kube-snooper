@@ -25,6 +25,11 @@ class App extends Component {
     });
   };
 
+  onAdd = () => {
+    this.addServer();
+    this.refresh();
+  };
+
   fetchServers = async () => {
     try {
       const { data } = await axios.get('/api/servers');
@@ -57,13 +62,29 @@ class App extends Component {
     }
   };
 
+  addServer = async () => {
+    try {
+      await axios.post('/api/servers/add');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
     return (
       <div className="app">
         <Nav />
         <div className="container app__btn-group">
-          <Button bsStyle="primary" disabled={this.state.loading}>
+          <Button
+            className="app__btn-group__add"
+            bsStyle="primary"
+            onClick={this.onAdd}
+            disabled={this.state.loading}
+          >
             Add
+          </Button>
+          <Button disabled={this.state.loading} onClick={this.refresh}>
+            Refresh
           </Button>
           {this.state.error && <p>{this.state.error}</p>}
         </div>

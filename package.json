@@ -7,7 +7,7 @@
     "prestart": "npm run build",
     "start": "npm run server",
     "dev": "concurrently --prefix \"[{name}]\" --names \"client,server\" --kill-others \"npm run client\" \"npm run server\"",
-    "server": "node server.js",
+    "server": "nodemon server.js",
     "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
@@ -27,6 +27,7 @@
     "react-scripts": "1.1.4"
   },
   "devDependencies": {
-    "concurrently": "^3.3.0"
+    "concurrently": "^3.3.0",
+    "nodemon": "^1.17.5"
   }
 }

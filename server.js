@@ -2,15 +2,12 @@ const express = require('express');
 const path = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs');
-//const k8s = require('@kubernetes/client-node');
 const Client = require('kubernetes-client').Client;
 const config = require('kubernetes-client').config;
 
 const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 4000;
-
-const service_name = 'azure-minecraft';
 
 const kubeconfig = yaml.safeLoad(fs.readFileSync('./kubeConfig'));
 
@@ -50,9 +47,104 @@ app.get('/api/servers', (req, res) => {
   })();
 });
 
-app.get('/api/servers', (req, res) => {
-  (async function getServices() {
-    const services = await k8client.api.v1.namespaces('default').services.get();
-    res.status(200).send(services);
+app.post('/api/servers/add', (req, res) => {
+  (async function addServer() {
+    const name = 'minecraft-' + new Date().valueOf();
+    const deploymentReq = {
+      body: {
+        apiVersion: 'apps/v1beta1',
+        kind: 'Deployment',
+        metadata: {
+          name: name
+        },
+        spec: {
+          replicas: 1,
+          selector: {
+            matchLabels: {
+              app: name
+            }
+          },
+          template: {
+            metadata: {
+              labels: {
+                app: name
+              }
+            },
+            spec: {
+              containers: [
+                {
+                  name: name,
+                  image: 'openhack/minecraft-server:2.0',
+                  env: [
+                    {
+                      name: 'EULA',
+                      value: 'TRUE'
+                    }
+                  ],
+                  ports: [
+                    {
+                      containerPort: 25565,
+                      name: 'minecraft'
+                    },
+                    {
+                      containerPort: 25575,
+                      name: 'rcon'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    };
+
+    try {
+      const resp = await k8client.apis.apps.v1beta1
+        .namespaces('default')
+        .deployments.post(deploymentReq);
+      console.log(resp);
+    } catch (e) {
+      console.log('error:', e);
+    }
+
+    const service = {
+      body: {
+        kind: 'Service',
+        apiVersion: 'v1',
+        metadata: {
+          name: name
+        },
+        spec: {
+          ports: [
+            {
+              name: 'minecraft',
+              port: 25565,
+              targetPort: 25565
+            },
+            {
+              name: 'rcon',
+              port: 25575,
+              targetPort: 25575
+            }
+          ],
+          selector: {
+            app: name
+          },
+          type: 'LoadBalancer'
+        }
+      }
+    };
+
+    console.log('servie body:', service);
+
+    try {
+      const respSvr = await k8client.api.v1.namespaces('default').services.post(service);
+      console.log(respSvr);
+    } catch (e) {
+      console.log('error:', e);
+    }
+
+    res.status(200).send(deploymentReq);
   })();
 });
