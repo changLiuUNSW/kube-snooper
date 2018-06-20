@@ -30,6 +30,11 @@ class App extends Component {
     this.refresh();
   };
 
+  onDelete = name => {
+    this.deleteServer(name);
+    this.refresh();
+  };
+
   fetchServers = async () => {
     try {
       const { data } = await axios.get('/api/servers');
@@ -70,6 +75,14 @@ class App extends Component {
     }
   };
 
+  deleteServer = async name => {
+    try {
+      await axios.post('/api/servers/delete', { name: name });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
     return (
       <div className="app">
@@ -96,6 +109,7 @@ class App extends Component {
               name={server.name}
               endpoints={server.endpoints}
               status={server.status}
+              onDelete={this.onDelete}
             />
           ))}
       </div>

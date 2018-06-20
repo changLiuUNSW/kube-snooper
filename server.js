@@ -148,3 +148,30 @@ app.post('/api/servers/add', (req, res) => {
     res.status(200).send(deploymentReq);
   })();
 });
+
+app.post('/api/servers/delete', (req, res) => {
+  (async function deleteServer() {
+    const services = await k8client.api.v1.namespaces('default').services.get();
+    const delName = req.body.name;
+    console.log('delete name:', delName);
+
+    try {
+      const resp = await k8client.api.v1
+        .namespaces('default')
+        .services(delName)
+        .delete();
+    } catch (e) {
+      console.log(e);
+    }
+    try {
+      const resp2 = await k8client.apis.apps.v1beta1
+        .namespaces('default')
+        .deployments(delName)
+        .delete();
+    } catch (e) {
+      console.log(e);
+    }
+
+    res.status(200).send(services);
+  })();
+});
