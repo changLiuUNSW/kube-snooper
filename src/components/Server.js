@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import ReactJson from 'react-json-view';
 
 const Server = ({ name, endpoints, status, onDelete }) => {
   const onclick = () => {
@@ -20,7 +21,7 @@ const Server = ({ name, endpoints, status, onDelete }) => {
                 <p>Address: {endpoints[key]}</p>
               </div>
             ))}
-            <pre>{JSON.stringify(status)}</pre>
+            <ReactJson src={status} />
             <Button bsStyle="danger" onClick={onclick}>
               Delete
             </Button>
