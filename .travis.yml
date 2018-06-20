@@ -4,7 +4,7 @@ service:
   - docker
 deploy:
   provider: script
-  script: bash docker-publish.sh
+  script: bash kube-publish.sh
   skip_cleanup: true
   on:
     branch: master
