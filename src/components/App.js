@@ -30,18 +30,25 @@ class App extends Component {
       const { data } = await axios.get('/api/servers');
       let ipAddr;
       for (const server of data) {
+        let found = false;
         for (const key in server.endpoints) {
           const [ip, port] = server.endpoints[key].split(':');
           if (port === '25565') {
             ipAddr = ip;
+            found = true;
             break;
           }
         }
-        try {
-          const { data } = await axios.get(`http://mcapi.us/server/status?ip=${ipAddr}&port=25565`);
-          server.status = data;
-        } catch (error) {
-          server.status = error;
+        server.found = found;
+        if (found) {
+          try {
+            const { data } = await axios.get(
+              `http://mcapi.us/server/status?ip=${ipAddr}&port=25565`
+            );
+            server.status = data;
+          } catch (error) {
+            server.status = error;
+          }
         }
       }
       this.setState({ loading: false, error: null, servers: data });
@@ -60,14 +67,16 @@ class App extends Component {
           </Button>
           {this.state.error && <p>{this.state.error}</p>}
         </div>
-        {this.state.servers.map(server => (
-          <Server
-            key={server.name}
-            name={server.name}
-            endpoints={server.endpoints}
-            status={server.status}
-          />
-        ))}
+        {this.state.servers
+          .filter(l => l.found)
+          .map(server => (
+            <Server
+              key={server.name}
+              name={server.name}
+              endpoints={server.endpoints}
+              status={server.status}
+            />
+          ))}
       </div>
     );
   }
